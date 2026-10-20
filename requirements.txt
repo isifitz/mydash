@@ -1,0 +1,5 @@
+flask
+anthropic
+mcp
+pytest
+python-dotenv

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% macro make_now(item) %}
+  <form method="post" action="{{ url_for('make_now', item_id=item.id) }}" class="inline">
+    <button>Make NOW</button>
+  </form>
+{% endmacro %}
+{% block content %}
+<h1>Today</h1>
+
+{% if t.now %}
+  {% set n = t.now %}
+  <section class="now">
+    <h2>NOW: <a href="{{ url_for('item_detail', item_id=n.id) }}">{{ n.title }}</a></h2>
+    <p class="meta">{{ n.path }} · {{ n.due|countdown }}</p>
+    <p><strong>Done when:</strong> {{ n.done_def }}</p>
+    <div class="actions">
+      <button data-toggle="f-done">Done</button>
+      <button data-toggle="f-problem">Problem</button>
+      <button data-toggle="f-update">Update</button>
+    </div>
+
+    <form method="post" action="{{ url_for('update', item_id=n.id) }}" id="f-done" class="hidden">
+      <input type="hidden" name="kind" value="done">
+      <input name="text" placeholder="Optional note">
+      <button>Mark done</button>
+      <p class="meta">Then pick what's NOW next from NEXT below.</p>
+    </form>
+
+    <form method="post" action="{{ url_for('update', item_id=n.id) }}" id="f-problem" class="hidden">
+      <label><input type="radio" name="kind" value="small_problem" checked> Small (clear fix)</label>
+      <label><input type="radio" name="kind" value="big_problem"> Big (no clear fix)</label>
+      <input name="text" placeholder="What happened?">
+      <input name="next_step" placeholder="Small: What's the fix? / Big: One step that moves it?">
+      <input name="next_due" placeholder="When? (YYYY-MM-DD) / When do we look again?">
+      <button>Save problem</button>
+    </form>
+
+    <form method="post" action="{{ url_for('update', item_id=n.id) }}" id="f-update" class="hidden">
+      <input type="hidden" name="kind" value="progress">
+      <input name="text" placeholder="Progress note" required>
+      <button>Log progress</button>
+    </form>
+  </section>
+{% else %}
+  <section class="now empty">
+    <h2>Nothing is NOW. Pick one:</h2>
+    {% for i in t.next %}
+      <p>{{ i.title }} <span class="meta">{{ i.due|countdown }}</span> {{ make_now(i) }}</p>
+    {% else %}
+      <p class="meta">NEXT is empty too. Triage something in the <a href="{{ url_for('inbox') }}">Inbox</a>.</p>
+    {% endfor %}
+  </section>
+{% endif %}
+
+<section>
+  <h2>Due today &amp; overdue</h2>
+  {% for i in t.due %}
+    <p><a href="{{ url_for('item_detail', item_id=i.id) }}">{{ i.title }}</a>
+      <span class="meta">{{ i.status }} · {{ i.due|countdown }}</span></p>
+  {% else %}<p class="meta">Nothing due.</p>{% endfor %}
+</section>
+
+{% if t.now %}
+<section>
+  <h2>NEXT</h2>
+  {% for i in t.next %}
+    <p>{{ i.title }} <span class="meta">{{ i.due|countdown }}</span> {{ make_now(i) }}</p>
+  {% else %}<p class="meta">NEXT is empty.</p>{% endfor %}
+</section>
+{% endif %}
+
+<section>
+  <h2>Since last time</h2>
+  {% for i in t.done_recent %}
+    <p>✓ {{ i.title }}</p>
+  {% else %}<p class="meta">Nothing finished in the last 24 hours.</p>{% endfor %}
+</section>
+{% endblock %}

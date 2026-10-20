@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ item.title }}</h1>
+<p class="meta">Status: {{ item.status }}{% if item.note %} · {{ item.note }}{% endif %}</p>
+
+{% for e in errors %}<p class="error">{{ e }}</p>{% endfor %}
+
+{% if item.status == 'done' %}
+  <p>Done {{ item.done_at }} — done items are final.</p>
+  <p><strong>Path:</strong> {{ item.path }} · <strong>Done when:</strong> {{ item.done_def }}</p>
+{% elif item.status == 'inbox' %}
+  <p>Triage this in the <a href="{{ url_for('inbox') }}">Inbox</a>.</p>
+{% else %}
+  <form method="post" class="card">
+    {% include "_fields.html" %}
+    <div class="actions"><button>Save</button></div>
+  </form>
+{% endif %}
+
+<h2>History</h2>
+{% for u in updates %}
+  <p><span class="meta">{{ u.at }} · {{ u.outcome }}</span><br>{{ u.text }}
+    {% if u.next_step %}<br>Next: {{ u.next_step }} ({{ u.next_due }}){% endif %}</p>
+{% else %}<p class="meta">No updates yet.</p>{% endfor %}
+{% endblock %}

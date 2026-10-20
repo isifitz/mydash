@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Board</h1>
+{% for pillar in pillars %}
+  {% set cols = board[pillar] %}
+  {% if cols.now or cols.next or cols.later or cols.blocked or cols.parked or pillar != 'Parked' %}
+  <section>
+    <h2>{{ pillar }}</h2>
+    <div class="columns">
+      {% for name in ['now', 'next', 'later', 'blocked'] %}
+        <div class="column">
+          <h3>{{ name|upper }}</h3>
+          {% for i in cols[name] %}
+            <a class="tile" href="{{ url_for('item_detail', item_id=i.id) }}">
+              <strong>{{ i.title }}</strong>
+              <span class="meta">{{ i.due|countdown }}</span>
+              <span class="meta">{{ i.done_def }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    {% if cols.parked %}
+      <details>
+        <summary>Parked ({{ cols.parked|length }})</summary>
+        {% for i in cols.parked %}
+          <p><a href="{{ url_for('item_detail', item_id=i.id) }}">{{ i.title }}</a></p>
+        {% endfor %}
+      </details>
+    {% endif %}
+  </section>
+  {% endif %}
+{% endfor %}
+{% endblock %}

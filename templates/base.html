@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mydash</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav>
+    <a href="{{ url_for('today') }}">Today</a>
+    <a href="{{ url_for('inbox') }}">Inbox</a>
+    <a href="{{ url_for('board') }}">Board</a>
+  </nav>
+  <main>
+    {% for message in get_flashed_messages() %}
+      <p class="error">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

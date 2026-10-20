@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Inbox</h1>
+
+<form method="post" action="{{ url_for('inbox') }}" class="capture">
+  <input name="title" placeholder="What's on your mind? Press Enter" autofocus required maxlength="120">
+</form>
+
+{% for c in cards %}
+  {% set item = c.item %}
+  {% set fields = c.fields %}
+  <section class="card" id="item-{{ item.id }}">
+    <h2>{{ item.title }}</h2>
+    {% for e in c.errors %}<p class="error">{{ e }}</p>{% endfor %}
+    <form method="post">
+      {% include "_fields.html" %}
+      <div class="actions">
+        <button formaction="{{ url_for('confirm', item_id=item.id) }}">Confirm</button>
+        <button formaction="{{ url_for('park', item_id=item.id) }}">Park</button>
+        <button formaction="{{ url_for('repropose', item_id=item.id) }}" formnovalidate>Re-propose</button>
+        <button formaction="{{ url_for('discard', item_id=item.id) }}" formnovalidate>Discard</button>
+      </div>
+    </form>
+    {% if item.proposal and item.proposal.questions %}
+      <ul class="questions">
+        {% for q in item.proposal.questions %}<li>{{ q }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+{% else %}
+  <p class="meta">Inbox is empty.</p>
+{% endfor %}
+{% endblock %}

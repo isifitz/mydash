@@ -1,0 +1,26 @@
+{# Shared triage fields. Needs `fields` and `paths`. Marks AI-filled and blank fields. #}
+{% macro mark(src) %}{% if src == 'ai' %}<span class="badge">AI</span>{% endif %}{% endmacro %}
+<label class="{{ fields.path[1] }}">Path {{ mark(fields.path[1]) }}
+  <input name="path" list="paths" value="{{ fields.path[0] }}">
+</label>
+<label class="{{ fields.status[1] }}">Status {{ mark(fields.status[1]) }}
+  <select name="status">
+    <option value="">Pick…</option>
+    {% for s in statuses %}
+      <option value="{{ s }}" {% if s == fields.status[0] %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+</label>
+<label class="{{ fields.due_date[1] }}">Due {{ mark(fields.due_date[1]) }}
+  <input type="date" name="due_date" value="{{ fields.due_date[0] }}">
+  <input type="time" name="due_time" value="{{ fields.due_time[0] }}">
+</label>
+<label class="{{ fields.done_def[1] }}">Done when {{ mark(fields.done_def[1]) }}
+  <input name="done_def" value="{{ fields.done_def[0] }}">
+</label>
+<label class="{{ fields.est_minutes[1] }}">Est. minutes {{ mark(fields.est_minutes[1]) }}
+  <input type="number" name="est_minutes" value="{{ fields.est_minutes[0] }}">
+</label>
+<datalist id="paths">
+  {% for p in paths %}<option value="{{ p }}">{% endfor %}
+</datalist>
