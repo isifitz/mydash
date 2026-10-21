@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from flask import Flask, flash, redirect, render_template, request, url_for
 
 import ai
+import calendar_sync
 import config
 import store
 
@@ -88,6 +89,13 @@ def flash_errors(e):
         flash(m)
 
 
+def sync_calendar(item_id):
+    """Mirror an item's due date to Google Calendar; flash any clashes."""
+    clashes = calendar_sync.sync_due(store.get_item(item_id))
+    if clashes:
+        flash("Clashes with: " + ", ".join(clashes))
+
+
 # ---------- pages ----------
 
 @app.get("/")
@@ -124,6 +132,7 @@ def item_detail(item_id):
         posted = form_fields()
         try:
             store.confirm(item_id, **posted)
+            sync_calendar(item_id)
             return redirect(url_for("item_detail", item_id=item_id))
         except store.ValidationError as e:
             errors = e.messages
@@ -144,6 +153,7 @@ def confirm(item_id):
     posted = form_fields()
     try:
         store.confirm(item_id, **posted)
+        sync_calendar(item_id)
     except store.ValidationError as e:
         return render_inbox({item_id: e.messages}, {item_id: posted})
     return redirect(url_for("inbox"))
@@ -156,6 +166,7 @@ def park(item_id):
         store.confirm(item_id, posted["path"] or "Parked", "parked",
                       done_def=posted["done_def"],
                       est_minutes=posted["est_minutes"])
+        sync_calendar(item_id)
     except store.ValidationError as e:
         return render_inbox({item_id: e.messages}, {item_id: posted})
     return redirect(url_for("inbox"))
@@ -193,12 +204,14 @@ def update(item_id):
     try:
         if kind == "done":
             store.add_update(item_id, f.get("text") or "Done", "done")
+            sync_calendar(item_id)
         elif kind == "progress":
             store.add_update(item_id, f.get("text", ""), "progress")
         elif kind in ("small_problem", "big_problem"):
             store.add_update(item_id, f.get("text") or "Problem", kind,
                              next_step=f.get("next_step"),
                              next_due=f.get("next_due"))
+            sync_calendar(item_id)
         else:
             raise store.ValidationError("Pick an update type")
     except store.ValidationError as e:

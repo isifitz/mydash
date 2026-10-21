@@ -29,3 +29,9 @@ OUTCOMES = ["done", "progress", "small_problem", "big_problem"]
 
 MODEL = "claude-haiku-5-5"
 AI_TIMEOUT_SECONDS = 10
+
+GOOGLE_CREDENTIALS_PATH = BASE_DIR / "data" / "google_client_secret.json"
+GOOGLE_TOKEN_PATH = BASE_DIR / "data" / "google_token.json"
+GOOGLE_SCOPES = ["https://www.googleapis.com/auth/calendar"]
+GOOGLE_CALENDAR_ID = "primary"
+DEFAULT_EVENT_MINUTES = 60  # fallback length for a timed event with no est_minutes

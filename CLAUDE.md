@@ -20,6 +20,7 @@ The full design is in `docs/specs/2026-10-20-mydash-mvp-design.md`. **Read it be
 app.py          Flask routes only — thin, no SQL, no validation logic
 store.py        schema, validation (ValidationError), every query
 ai.py           propose(title, note) -> dict | None
+calendar_sync.py  sync_due(item) -> list[str] | None (Google Calendar, Phase 2)
 mcp_server.py   MCP tools wrapping store.py (stdio; HTTP later via flag)
 config.py       pillars, timezone (Africa/Johannesburg), caps, model name
 rules.md        rulebook for the AI and for agents
@@ -30,7 +31,7 @@ templates/ static/ tests/ data/ docs/
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env               # add ANTHROPIC_API_KEY (optional)
+                                    # .env holds ANTHROPIC_API_KEY (optional, gitignored)
 python app.py                      # http://127.0.0.1:5000
 pytest -q
 claude mcp add mydash -- python mcp_server.py   # verify syntax in current docs

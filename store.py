@@ -363,6 +363,14 @@ def save_proposal(item_id, proposal):
                      (json.dumps(proposal) if proposal else None, item_id))
 
 
+def set_calendar_id(item_id, calendar_id):
+    """Record (or clear) the Google Calendar event id for an item."""
+    with _connect() as conn:
+        _load(conn, item_id, allow_done=True)
+        conn.execute("UPDATE items SET calendar_id=? WHERE id=?",
+                     (calendar_id, item_id))
+
+
 # ---------- queries ----------
 
 def get_item(item_id):
